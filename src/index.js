@@ -1,6 +1,7 @@
 import {fabric} from 'fabric';
 const IMG_SRC_1 = require('./test1.png');
 const IMG_SRC_2 = require('./test2.png');
+const IMG_SRC_3 = require('./test3.jpg');
 
 
 const canvasEle = document.createElement('canvas');
@@ -175,7 +176,7 @@ const canvas2dBackend = new fabric.Canvas2dFilterBackend()
 
 fabric.filterBackend = fabric.initFilterBackend();
 fabric.Object.prototype.transparentCorners = false;
-fabric.Object.prototype.padding = 5;
+// fabric.Object.prototype.padding = 5;
 
 const canvas = new fabric.Canvas(canvasEle);
 const f = fabric.Image.filters;
@@ -198,44 +199,84 @@ function applyFilter(index, filter) {
 
 window._canvas = canvas;
 
-let x = 1;
-let y = 
+
+const radius = 50;
 
 fabric.Image.fromURL(IMG_SRC_1, function(img) {
-  const oImg1 = img.set({left: 0, top: 0 }).scale(0.5);
-  img.selectable = false;
+  const oImg1 = img.set({left: 0, top: 0 });
   const oImg2 = fabric.util.object.clone(img);
+  oImg2.set({left: 0, top: 0});
   oImg2.filters.push(new fabric.Image.filters.Noise({
-    noise: 800
+    noise: 300
   }));
   oImg2.applyFilters();
   oImg2.set({
     visible: false
   });
-  const group = new fabric.Group([oImg1, oImg2]);
+  window.oImg2 = oImg2;
+  const group = new fabric.Group([oImg1, oImg2], {
+    left: 0,
+    top: 0,
+  });
+  window.group = group;
   canvas.add(group);
-  canvas.on('mouse:down', function(e){
-    const { target } = e;   
+  canvas.on('mouse:up', function(e){
+    const { target } = e;
+    let p1 = canvas.getPointer(e.e);   
     if (target && target.type === 'group') {      
       const cover = target.item(1);
-      var p = canvas.getPointer(e.e);
-      const center = {
-        x: p.x  - cover.getScaledWidth(),  
-        y: p.y  - cover.getScaledHeight(),
-      }
-      const clipPath = new fabric.Circle({
-        radius: 200, 
-        left: center.x, 
-        top: center.y, 
+      
+      const currentClip = new fabric.Circle({
+        left: cover.left + p1.x - target.left - radius,
+        top: cover.top + p1.y - target.top - radius,
+        orignX: 'left',
+        originY: 'top',
+        radius: radius,   
       });
+
+      let clipPathGroup;
+      if (cover.clipPath && cover.clipPath.type === 'group') {
+        let originGroup = fabric.util.object.clone(cover.clipPath);
+        clipPathGroup = originGroup;
+        clipPathGroup.addWithUpdate(currentClip);
+      } else {
+        clipPathGroup = new fabric.Group([
+          currentClip
+        ]);
+      }
       cover.set({
         visible: true,
-        clipPath: clipPath
+        clipPath: clipPathGroup
       });
       canvas.renderAll();
     }
   })
 });
+
+
+document.addEventListener('keydown', e => {
+  
+  if (e.keyCode === 90 && e.ctrlKey) {
+    // undo
+    if (oImg2.clipPath && oImg2.clipPath.type === 'group') {
+      let group = fabric.util.object.clone(oImg2.clipPath);
+      const items = group.getObjects();
+      console.log(items.length)
+      if (Array.isArray(items) && items.length > 1) {
+        group.removeWithUpdate(items[items.length - 1]);
+      } else {
+        group = new fabric.Group([]);
+      }  
+      oImg2.set({
+        clipPath: group
+      })
+      canvas.renderAll();
+
+    }
+    
+  }
+
+})
 
 
   
