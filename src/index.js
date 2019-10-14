@@ -1,24 +1,27 @@
 import {fabric} from 'fabric';
-const IMG_SRC_1 = require('./test1.png');
-const IMG_SRC_2 = require('./test2.png');
-const IMG_SRC_3 = require('./test3.jpg');
+import './command/test';
+const IMG_SRC_1 = require('./test-images/test1.png');
+const IMG_SRC_2 = require('./test-images/test2.png');
+const IMG_SRC_3 = require('./test-images/test3.jpg');
 
+
+const style = document.createElement('style');
+style.innerHTML = 'html body { padding: 0; margin: 0;}';
+document.head.appendChild(style);
 
 const canvasEle = document.createElement('canvas');
-canvasEle.style.width = '800px';
-canvasEle.style.height = '800px';
-canvasEle.style.border = '2px red solid';
-canvasEle.width = 800;
-canvasEle.height = 800;
+canvasEle.width = window.screen.availWidth - 300;
+canvasEle.height = window.screen.availHeight;
 document.body.appendChild(canvasEle);
 
 const controlPanel = document.createElement('div');
 controlPanel.style.position = 'fixed';
 controlPanel.style.right = '0';
 controlPanel.style.top = '0';
+controlPanel.style.bottom = '0';
 controlPanel.style.width = '300px';
-controlPanel.style.height = '800px';
 controlPanel.style.overflow = 'auto';
+controlPanel.style.background = 'rgba(0,0,0,0.1)';
 controlPanel.innerHTML = `
 <div class="controls">
   <h3>Filters:</h3>
@@ -206,9 +209,12 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
   const oImg1 = img.set({left: 0, top: 0 });
   const oImg2 = fabric.util.object.clone(img);
   oImg2.set({left: 0, top: 0});
-  oImg2.filters.push(new fabric.Image.filters.Noise({
-    noise: 300
-  }));
+  oImg2.filters.push(
+    // new fabric.Image.filters.Noise({
+    //   noise: 300
+    // }),
+    new fabric.Image.filters.BlackWhite()
+  );
   oImg2.applyFilters();
   oImg2.set({
     visible: false
@@ -229,8 +235,6 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
       const currentClip = new fabric.Circle({
         left: cover.left + p1.x - target.left - radius,
         top: cover.top + p1.y - target.top - radius,
-        orignX: 'left',
-        originY: 'top',
         radius: radius,   
       });
 
