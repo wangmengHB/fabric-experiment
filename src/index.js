@@ -516,6 +516,20 @@ function applyFilterValue(index, prop, value) {
 
 
 
+function test() {
+
+  try {
+    console.log(1);
+
+    return console.log('return') || 'rest';
+
+  } finally {
+    console.log('finally.')
+  }
+
+}
+window.a = test();
+console.log('run test');
 
 
 
