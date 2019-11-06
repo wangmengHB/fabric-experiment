@@ -50,8 +50,8 @@ async function start() {
         vshader: defaultVertexSource,
         fshader: GLSL_FS_brightnessContrast,
         values: {
-          brightness: -0.8,
-          contrast: 0.1,
+          brightness: -0.5,
+          contrast: 0,
         },
         updateValues: function(brightness, contrast) {
           if (typeof brightness === 'number') {
@@ -70,8 +70,8 @@ async function start() {
         vshader: defaultVertexSource,
         fshader: GLSL_FS_hueSaturation,
         values: {
-          hue: 0.2,
-          saturation: -0.3,
+          hue: 0,
+          saturation: 0,
         },
         updateValues: function(hue, saturation) {
           if (typeof hue === 'number') {
@@ -217,22 +217,8 @@ function initFramebufferObject(gl, width, height) {
 function toImage() {
   let width = window._width;
   let height = window._height;
-  let gl = window._gl;
-  // let can = document.createElement('canvas');
-  // let c = can.getContext('2d');
-
-  // var size = width * height * 4;
-  // var pixels = new Uint8Array(size);
-  
-  // var data = c.createImageData(width, height);
-  // gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-  // for (var i = 0; i < size; i++) {
-  //     data.data[i] = pixels[i];
-  // }
-  // c.putImageData(data, 0, 0);
-
   const img = new Image();
-  img.src = window.canvas.toDataURL();
+  img.src = canvas.toDataURL();
   img.width = width;
   img.height = height;
 
