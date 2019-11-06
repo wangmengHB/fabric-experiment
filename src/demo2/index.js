@@ -1,6 +1,7 @@
 const IMG_SRC_1 = require('../test-images/test1.png');
 const IMG_SRC_2 = require('../test-images/test2.png');
 const IMG_SRC_3 = require('../test-images/test3.jpg');
+import GLImage, { loadImage } from '../demo3/gl-image';
 import initShaders from './initShaders';
 import {common, single} from './initVertexBuffers';
 import initTexture from './initTexture';
@@ -14,31 +15,29 @@ import {
 const style = document.createElement('style');
 style.innerHTML = 'html body { padding: 0; margin: 0;}';
 document.head.appendChild(style);
+
+
 const canvasEle = document.createElement('canvas');
 document.body.appendChild(canvasEle);
+
+
+debugger;
+let glImage = new GLImage(canvasEle);
+// let canvasEle = a.getCanvas();
+
+// document.body.appendChild(canvasEle);
 
 window.canvas = canvasEle;
 
 
 
-function loadImage(imgSrc) {
-  return new Promise((resolve, reject) => {
-    let oImage = new Image()
-    oImage.onload = () => {
-        resolve(oImage)
-    }
-    oImage.onerror = () => {
-        reject(new Error('load error'))
-    }
-    oImage.src = imgSrc
-  })
-}
+
 
 async function start() {
   let oImage = await loadImage(IMG_SRC_1);
   window._width = canvasEle.width = oImage.width;   // 初始化canvas宽高
   window._height = canvasEle.height = oImage.height;
-  let gl = canvasEle.getContext('webgl', {preserveDrawingBuffer: true});
+  let gl = glImage.getCanvas().getContext('webgl', {preserveDrawingBuffer: true});
   window._gl = gl;
 
 
@@ -94,26 +93,22 @@ async function start() {
   
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT);
+  let imgTexture = initTexture(gl, oImage);
+
   common(gl);
   filterArr.forEach(item => {
     initShaders(gl, item.glsl);
     single(gl, item.glsl.program);
   });
 
-  let imgTexture = initTexture(gl, oImage);
+  
   let tempFramebuffers = [];
   let currentFramebufferIndex = 0;
 
 
-  filterArr.forEach((item, index) => {
-    gl.useProgram(item.glsl.program);
-    uniforms(gl, item.glsl.program, item.glsl.values);
+  update();
 
-    drawScene(item.glsl.program, index);
-  });
-
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
+  
   function update() {
     filterArr.forEach((item, index) => {
       gl.useProgram(item.glsl.program);
