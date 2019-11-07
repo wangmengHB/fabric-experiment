@@ -19,7 +19,7 @@
   "homepage": "https://github.com/wangmengHB/fabric-experiment#readme",
   "dependencies": {
     "fabric": "^3.4.0",
-    "gl-image": "latest",
+    "gl-image": "0.0.0-rc.8",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "util-kit": "^0.0.0-rc.6"
