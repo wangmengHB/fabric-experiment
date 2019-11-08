@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const webpack = require('webpack')
 const merge = require('webpack-merge')
+const path = require('path');
 const base = require('./webpack.base.conf.js')
 
 const config = merge(base, {
@@ -10,7 +11,7 @@ const config = merge(base, {
     devServer: {
         clientLogLevel: 'warning',
         hot: true,
-        contentBase: false, 
+        contentBase: path.join(__dirname, "../dist"), 
         compress: true,
         host: '0.0.0.0',
         port: 8081,
