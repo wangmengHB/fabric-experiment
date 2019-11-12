@@ -1,0 +1,128 @@
+//color define
+@black:                 #000;
+@grayDarker:            #222;
+@grayDark:              #3D3E4F;//cc
+@gray:                  #555;
+@gray2:                 #676976;//cc
+@grayLight:             #909090;
+@grayLightMod:          #898B9A;//cc
+@grayLight2:            #BBB;
+@grayLight3:            #B5B5B5;
+@grayLight4:            #B7B8C4;//cc
+@grayLighter:           #eee;
+@grayLighter2:          #DFE0E7;//cc
+@white:                 #fff;
+@orange:                #f60;
+
+// global style
+@bodyBackground:        @white;
+@textColor:             @gray;
+// Links
+@linkColor:             #3399e0;
+@linkColorHover:        darken(@linkColor, 15%);
+
+
+// Tables
+// -------------------------
+//@tableBackground:                   transparent; // overall background-color
+//@tableBackgroundAccent:             #f9f9f9; // for striping
+//@tableBackgroundHover:              #f5f5f5; // for hover
+//@tableBorder:                       #ddd; // table and cell border
+
+// Buttons
+// -------------------------
+@btnBackground:                     @white;
+@btnBackgroundHighlight:            darken(@white, 10%);
+@btnBorder:                         #bbb;
+
+@btnPrimaryBackground:              @linkColor;
+@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 20%);
+
+@btnInfoBackground:                 #5bc0de;
+@btnInfoBackgroundHighlight:        #2f96b4;
+
+@btnSuccessBackground:              #62c462;
+@btnSuccessBackgroundHighlight:     #51a351;
+
+@btnPayBackground:                  lighten(@orange, 15%);
+@btnPayBackgroundHighlight:         @orange;
+
+@btnDangerBackground:               #ee5f5b;
+@btnDangerBackgroundHighlight:      #bd362f;
+
+@btnInverseBackground:              #444;
+@btnInverseBackgroundHighlight:     @grayDarker;
+
+
+//App v5.0 colors
+@moduleBackgroundColor:             @white;
+@linkColor:                         @primaryColor;
+@linkColorActive:                   @secondaryColor;
+@appBackgroundColor:                #E6E6E6;
+
+
+//PC Colors as of starting 2017-07-22
+//---------main brand colors ------------------
+@primaryColor:          #F26F20;//cc
+@secondaryColor:        #ffa900;//cc
+
+@paymentColor:          @orange;
+@membershipColor:       #bda66a;
+
+//---------text colors ------------------------
+@titleColor:            @grayDark;   //标题
+@secondaryTitleColor:   @gray2;   //大面积信息，普通信息
+@textColor2:             #898B9A; //次要内容信息
+@tipColor:              @grayLightMod;
+@secondaryTipColor:     @grayLight4;
+@borderColor:           #DFE0E7;
+
+@pcLinkColor:           @primaryColor;//cc type-----?
+@pcLinkHoverColor:      #ff8c1b;
+@pcLinkActiveColor:     #e66100;
+
+//---------layout colors ----------------------
+@backgroundColor:       #F4F6F8;//cc
+@backgroundColorV2:     #FFFBF9;//cc
+@panelBackgroundColor:  @white;
+
+@warningColor:          #ffc800;//cc
+@successColor:          #4fc472;
+@dangerColor:           #ff4640;//cc
+
+
+//---------20171.20  cc---------------------
+@secondColorBlue:  #60c3d4;
+@secondColorPurple:     #735ac9;
+
+
+body,html{
+    background: #fff;
+}
+.cr-color-primary {
+    color: @primaryColor;
+}
+
+.cr-color-secondary {
+    color: @secondaryColor;
+}
+
+.cr-color-title{
+    color: @titleColor;
+}
+
+.cr-color-secondaryTitle {
+    color: @secondaryTitleColor;
+}
+
+.cr-color-tip {
+    color: @tipColor;
+}
+
+.cr-color-pclink {
+    color: @pcLinkColor;
+}
+
+.cr-color-pclinkhover {
+    color: @pcLinkHoverColor;
+}

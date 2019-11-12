@@ -1,0 +1,5 @@
+
+$(function() {
+  window.cFlash.init();
+});
+
