@@ -10,17 +10,6 @@ var cAnimation = window.cAnimation;
 var cNum = window.cNum;
 var cSwiper = window.Swiper;
 
-    var flash = {
-        init: function(){
-          
-          
-        },
-        
-        
-        
-        
-    };
-
 $(function() {
   $('[data-scenes=1]').find('[data-num]').map(function(ind,item){
     var key = $(item).attr('data-num');
@@ -42,64 +31,64 @@ $(function() {
   var numRun = new cNum($('[data-scenes=1]'));
   player.enter(0);
 
-    window.swiper = this.swiper = new cSwiper('.swiper-container', {
-        direction: 'vertical',
-        speed:600,
-        parallax:true,
-        mousewheel: true,
-        simulateTouch: false,
-        slidesPerView: 'auto',
-        longSwipesMs: 1000,
-        longSwipesRatio: 0.1,
-        pagination: {
-          el: '.swiper-pagination',
-          clickable: true,
+  const swiper = new cSwiper('.swiper-container', {
+    direction: 'vertical',
+    speed:600,
+    parallax:true,
+    mousewheel: true,
+    simulateTouch: false,
+    slidesPerView: 'auto',
+    longSwipesMs: 1000,
+    longSwipesRatio: 0.1,
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true,
+    },
+    on:{
+        init:function(e){
+            if( win_hei < min_hei){
+                
+                win_hei = min_hei;
+            }
         },
-        on:{
-            init:function(e){
-                if( win_hei < min_hei){
-                    
-                    win_hei = min_hei;
-                }
-            },
-            resize:function(){
-                var self = this;
-                setTimeout(function() {
-                  
-                    win_hei = $(window).height();
-                    if( win_hei < min_hei){
-                        win_hei = min_hei;
-                    }
-                    if(self.activeIndex >= 1 && self.activeIndex < 4){
-                        var _top = self.snapGrid[self.activeIndex] + win_hei*0.5;
-                        $video.css('top' , _top);
-                    }
-                    self.updateSize();
-                }, 100);
-            },
-            slideChange:function(){
-                if(this.previousIndex === this.activeIndex){
-                    return false;
-                }
-                player.enter(this.activeIndex);
-                if(this.activeIndex >= 1 && this.activeIndex < 4){
-                    var _top = this.snapGrid[this.activeIndex] + win_hei*0.5;
-                    $video.css('top' , _top);
-                }
-                if(this.activeIndex === 1){
-                    numRun.run();
-                }
-                if(this.activeIndex === 0){
-                  this.pagination.$el.addClass("clarity");
-                }else{
-                  this.pagination.$el.removeClass("clarity");
-                }
+        resize:function(){
+            
+          setTimeout(() => {
+            
+            win_hei = $(window).height();
+            if( win_hei < min_hei){
+                win_hei = min_hei;
+            }
+            if(this.activeIndex >= 1 && this.activeIndex < 4){
+                var _top = this.snapGrid[this.activeIndex] + win_hei*0.5;
+                $video.css('top' , _top);
+            }
+            this.updateSize();
+          }, 100);
+        },
+        slideChange:function(){
+            if(this.previousIndex === this.activeIndex){
+                return false;
+            }
+            player.enter(this.activeIndex);
+            if(this.activeIndex >= 1 && this.activeIndex < 4){
+                var _top = this.snapGrid[this.activeIndex] + win_hei*0.5;
+                $video.css('top' , _top);
+            }
+            if(this.activeIndex === 1){
+                numRun.run();
+            }
+            if(this.activeIndex === 0){
+              this.pagination.$el.addClass("clarity");
+            }else{
+              this.pagination.$el.removeClass("clarity");
             }
         }
-    });
+    }
+});
 
   setTimeout(() => {
-    this.swiper.update();
+    swiper.update();
   }, 300);
 })
 
