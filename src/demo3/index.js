@@ -142,10 +142,9 @@ batchProcess(imageSrcList).then((result) => {
 
 
 
-// let canvas = glImage.getCanvas();
-// document.body.appendChild(canvas);
+let canvas = glImage.getCanvas();
+document.body.appendChild(canvas);
 
 
 window.glImage = glImage;
-window.SRC_2 = IMG_SRC_2;
-window.SRC_3 = IMG_SRC_3;
+

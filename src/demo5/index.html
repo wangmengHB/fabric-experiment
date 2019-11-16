@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+</head>
+<body>
+<style>
+.container {
+  position: relative;
+  margin: 100px auto;
+  width: 400px;
+  height: 400px;
+}
+
+.underlay,
+.mask,
+.overlay{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.underlay {
+  z-index: 1;
+  display: block;
+}
+
+.mask {
+  z-index: 2;
+  background: rgba(0,0,0,0.1);
+}
+
+.overlay {
+  z-index: 3;
+  left: 20px;
+  right: 20px;
+  top: 20px;
+  bottom: 20px;
+}
+
+
+</style>
+
+<div class="container">
+  <img class="underlay" src="http://img1.imgtn.bdimg.com/it/u=3608155120,1630233151&fm=26&gp=0.jpg" />
+  <div class="mask"></div>
+  <div class="overlay"></div>
+
+</div>
+
+</body>
+</html>
