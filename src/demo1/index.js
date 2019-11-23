@@ -52,50 +52,50 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
   });
   window.group = group;
 
-  let p1 = {x: 400, y: 200};
 
-  const currentClip = new fabric.Circle({
-    left: oImg2.left + p1.x - group.left - radius,
-    top: oImg2.top + p1.y - group.top - radius,
-    radius: 600,
-  });
 
 
   oImg2.set({
-    visible: true,
-    clipPath: currentClip
+    visible: false,
   });
+
+  group.selectable = false
+
+  
 
 
 
   canvas.add(group);
   canvas.renderAll();
 
+  let isDrawing = false;
+
   canvas.on('mouse:up', function(e){
     const { target } = e;
     let p1 = canvas.getPointer(e.e);   
     if (target && target.type === 'group') {      
       const cover = target.item(1);
-      
-      const currentClip = new fabric.Circle({
-        left: cover.left + p1.x - target.left - radius,
-        top: cover.top + p1.y - target.top - radius,
-        radius: radius,   
-      });
 
-      let clipPathGroup;
-      if (cover.clipPath && cover.clipPath.type === 'group') {
-        let originGroup = fabric.util.object.clone(cover.clipPath);
-        clipPathGroup = originGroup;
-        clipPathGroup.addWithUpdate(currentClip);
+      let clipPath;
+
+      if (cover.clipPath) {
+        clipPath = cover.clipPath;
       } else {
-        clipPathGroup = new fabric.Group([
-          currentClip
-        ]);
+        clipPath = new fabric.Path(`M ${oImg2.left + p1.x - group.left} ${oImg2.top + p1.y - group.top}`);
+        clipPath.set({
+          left: 0,
+          top: 0,
+          stroke: 'green',
+          opacity: 1,
+          strokeWidth: 10,
+        });
       }
+      
+      window._path = clipPath;
+      
       cover.set({
         visible: true,
-        clipPath: clipPathGroup
+        clipPath: clipPath
       });
       canvas.renderAll();
     }
