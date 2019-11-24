@@ -24,7 +24,9 @@ const config = merge(base, {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'test util function'
+          title: 'test util function',
+          inject: 'body',
+          template: path.join(__dirname, './index.html'),
         }),
         new webpack.HotModuleReplacementPlugin()
     ]

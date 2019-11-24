@@ -15,25 +15,18 @@ canvasEle.height = window.screen.availHeight;
 document.body.appendChild(canvasEle);
 
 
-
-
 let webglBackend = new fabric.WebglFilterBackend();
 fabric.filterBackend = fabric.initFilterBackend();
 fabric.filterBackend = webglBackend;
 fabric.Object.prototype.transparentCorners = false;
 fabric.Object.prototype.padding = 5;
 
-const canvas = new fabric.Canvas(canvasEle);
-
-
-
-
-
-
+const canvas = new fabric.Canvas(canvasEle, {isDrawingMode: true});
+canvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
 window._canvas = canvas;
 
 
-const radius = 50;
+const RADIUS = 20;
 
 fabric.Image.fromURL(IMG_SRC_1, function(img) {
   const oImg1 = img.set({left: 0, top: 0 });
@@ -47,12 +40,12 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
 
   window.oImg2 = oImg2;
   const group = new fabric.Group([oImg1, oImg2], {
+    name: 'picture1',
+    id: '123',
     left: 0,
     top: 0,
   });
   window.group = group;
-
-
 
 
   oImg2.set({
@@ -61,46 +54,126 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
 
   group.selectable = false
 
-  
-
-
-
   canvas.add(group);
+
+
+  var clipPath = new fabric.Circle({
+    radius: 40,
+    top: -40,
+    left: -40
+  });
+  var rect = new fabric.Rect({
+    width: 200,
+    height: 100,
+    fill: 'red',
+  });
+  rect.clipPath = clipPath;
+  canvas.add(rect);
+
+
   canvas.renderAll();
 
-  let isDrawing = false;
-
-  canvas.on('mouse:up', function(e){
-    const { target } = e;
-    let p1 = canvas.getPointer(e.e);   
-    if (target && target.type === 'group') {      
-      const cover = target.item(1);
-
-      let clipPath;
-
-      if (cover.clipPath) {
-        clipPath = cover.clipPath;
-      } else {
-        clipPath = new fabric.Path(`M ${oImg2.left + p1.x - group.left} ${oImg2.top + p1.y - group.top}`);
-        clipPath.set({
-          left: 0,
-          top: 0,
-          stroke: 'green',
-          opacity: 1,
-          strokeWidth: 10,
-        });
-      }
-      
-      window._path = clipPath;
-      
-      cover.set({
-        visible: true,
-        clipPath: clipPath
-      });
-      canvas.renderAll();
-    }
-  })
 });
+
+window.isDrawing = false;
+
+canvas.on('mouse:down', function(e){
+  const { target } = e;
+  let p1 = canvas.getPointer(e.e);
+  const name = target && target.get('name');
+
+  
+  
+  if (name === 'picture1') {
+    window.isDrawing = true;     
+    
+    const cover = target.item(1);
+
+    const point = {
+      x: cover.left + p1.x - target.left,
+      y: cover.top + p1.y - target.top
+    };
+
+    let clipPath;
+
+    if (cover.clipPath) {
+      clipPath = cover.clipPath;
+    } else {
+      clipPath = new fabric.Group([]);
+      const circle = new fabric.Circle({
+        radius: RADIUS,
+        left: point.x - RADIUS,
+        top: point.y - RADIUS,
+      })
+      clipPath.addWithUpdate(circle);
+      
+    }
+
+    window._path = clipPath;
+   
+    
+    cover.set({
+      visible: true,
+      clipPath: clipPath
+    });
+    canvas.renderAll();
+  }
+});
+
+canvas.on('mouse:move', function(e){
+  const { target } = e;
+  let p1 = canvas.getPointer(e.e);
+  const name = target && target.get('name');
+  if (!isDrawing) {
+    return;
+  }
+
+  if (name === 'picture1') {     
+    
+    const cover = target.item(1);
+
+    const point = {
+      x: cover.left + p1.x - target.left,
+      y: cover.top + p1.y - target.top
+    };
+
+    let clipPath = cover.clipPath;
+
+    if (!clipPath) {
+      return;
+    }
+
+    let group = fabric.util.object.clone(clipPath);
+
+    const circle = new fabric.Circle({
+      radius: RADIUS,
+      left: point.x - RADIUS,
+      top: point.y - RADIUS,
+    })
+    group.addWithUpdate(circle);
+
+    
+    
+
+      
+    
+    cover.set({
+      visible: true,
+      clipPath: group
+    });
+    canvas.renderAll();
+  }
+});
+
+
+canvas.on('mouse:up', function(e){
+  const { target } = e;
+  let p1 = canvas.getPointer(e.e);
+  const name = target.get('name');
+  window.isDrawing = false;
+  return;
+});
+
 
 
 document.addEventListener('keydown', e => {
@@ -127,18 +200,7 @@ document.addEventListener('keydown', e => {
 
 })
 
-var clipPath = new fabric.Circle({
-  radius: 40,
-  top: -40,
-  left: -40
-});
-var rect = new fabric.Rect({
-  width: 200,
-  height: 100,
-  fill: 'red',
-});
-rect.clipPath = clipPath;
-canvas.add(rect);
+
 
 
   
