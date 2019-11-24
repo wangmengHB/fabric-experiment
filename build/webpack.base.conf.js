@@ -4,7 +4,7 @@ const path = require('path')
 module.exports = {
     context: path.resolve(__dirname, '../'),
     entry: {
-        'fabric-test': path.resolve(__dirname, '../src/demo3')
+        'fabric-test': path.resolve(__dirname, '../src/demo5')
     },
     output: {
         path: path.resolve(__dirname, '../dist'),
@@ -57,14 +57,30 @@ module.exports = {
               }
             ]
           },
+          { 
+            test: /\.coffee$/,
+            include: [/psd/],  
+            loader: 'coffee-loader' 
+          },
+          { 
+            test: /\.(coffee\.md|litcoffee)$/, 
+            include: [/psd/],
+            loader: 'coffee-loader?literate' 
+          },
+          { 
+            test: /\.json$/, 
+            include: [/psd/],
+            loader: 'json-loader' 
+          },
         ]
     },
     node: {
-        setImmediate: false,
-        dgram: 'empty',
-        fs: 'empty',
-        net: 'empty',
-        tls: 'empty',
-        child_process: 'empty'
+      setImmediate: false,
+      dgram: 'empty',
+      fs: 'empty',
+      net: 'empty',
+      tls: 'empty',
+      child_process: 'empty',
+      path: 'empty',
     }
 }
