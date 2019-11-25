@@ -1,5 +1,6 @@
 import {fabric} from 'fabric';
 import './command/test';
+import GLImage from 'gl-image';
 const IMG_SRC_1 = require('../test-images/test1.png');
 const IMG_SRC_2 = require('../test-images/test2.png');
 const IMG_SRC_3 = require('../test-images/test3.jpg');
@@ -22,8 +23,11 @@ fabric.Object.prototype.transparentCorners = false;
 fabric.Object.prototype.padding = 5;
 
 const canvas = new fabric.Canvas(canvasEle, {isDrawingMode: true});
-canvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
+
 window._canvas = canvas;
+
+const glImage = new GLImage();
+window.glImage = glImage;
 
 
 const RADIUS = 20;
@@ -73,106 +77,130 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
 
   canvas.renderAll();
 
+  setTimeout(() => {
+
+  }, 500)
+
+  
+  
+
+  glImage.loadImageSrc(canvas.toDataURL()).then(() => {
+    glImage.applyFilter('saturation', -0.7)
+
+    
+    let img2 = new Image();
+    img2.src = glImage.toDataUrl();
+
+    let texturePatternBrush = new fabric.PatternBrush(canvas);
+    texturePatternBrush.source = img2;
+
+    canvas.freeDrawingBrush = texturePatternBrush;
+    // canvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
+    canvas.freeDrawingBrush.width = 30;
+
+
+
+  })
+
+
+
+
+  
+
 });
 
 window.isDrawing = false;
 
-canvas.on('mouse:down', function(e){
-  const { target } = e;
-  let p1 = canvas.getPointer(e.e);
-  const name = target && target.get('name');
+// canvas.on('mouse:down', function(e){
+//   const { target } = e;
+//   let p1 = canvas.getPointer(e.e);
+//   const name = target && target.get('name');
 
   
   
-  if (name === 'picture1') {
-    window.isDrawing = true;     
+//   if (name === 'picture1') {
+//     window.isDrawing = true;     
     
-    const cover = target.item(1);
+//     const cover = target.item(1);
 
-    const point = {
-      x: cover.left + p1.x - target.left,
-      y: cover.top + p1.y - target.top
-    };
+//     const point = {
+//       x: cover.left + p1.x - target.left,
+//       y: cover.top + p1.y - target.top
+//     };
 
-    let clipPath;
+//     let clipPath;
 
-    if (cover.clipPath) {
-      clipPath = cover.clipPath;
-    } else {
-      clipPath = new fabric.Group([]);
-      const circle = new fabric.Circle({
-        radius: RADIUS,
-        left: point.x - RADIUS,
-        top: point.y - RADIUS,
-      })
-      clipPath.addWithUpdate(circle);
+//     if (cover.clipPath) {
+//       clipPath = cover.clipPath;
+//     } else {
+//       clipPath = new fabric.Group([]);
+//       const circle = new fabric.Circle({
+//         radius: RADIUS,
+//         left: point.x - RADIUS,
+//         top: point.y - RADIUS,
+//       })
+//       clipPath.addWithUpdate(circle);
       
-    }
+//     }
 
-    window._path = clipPath;
+//     window._path = clipPath;
    
     
-    cover.set({
-      visible: true,
-      clipPath: clipPath
-    });
-    canvas.renderAll();
-  }
-});
+//     cover.set({
+//       visible: true,
+//       clipPath: clipPath
+//     });
+//     canvas.renderAll();
+//   }
+// });
 
-canvas.on('mouse:move', function(e){
-  const { target } = e;
-  let p1 = canvas.getPointer(e.e);
-  const name = target && target.get('name');
-  if (!isDrawing) {
-    return;
-  }
+// canvas.on('mouse:move', function(e){
+//   const { target } = e;
+//   let p1 = canvas.getPointer(e.e);
+//   const name = target && target.get('name');
+//   if (!isDrawing) {
+//     return;
+//   }
 
-  if (name === 'picture1') {     
+//   if (name === 'picture1') {     
     
-    const cover = target.item(1);
+//     const cover = target.item(1);
 
-    const point = {
-      x: cover.left + p1.x - target.left,
-      y: cover.top + p1.y - target.top
-    };
+//     const point = {
+//       x: cover.left + p1.x - target.left,
+//       y: cover.top + p1.y - target.top
+//     };
 
-    let clipPath = cover.clipPath;
+//     let clipPath = cover.clipPath;
 
-    if (!clipPath) {
-      return;
-    }
+//     if (!clipPath) {
+//       return;
+//     }
 
-    let group = fabric.util.object.clone(clipPath);
+//     let group = fabric.util.object.clone(clipPath);
 
-    const circle = new fabric.Circle({
-      radius: RADIUS,
-      left: point.x - RADIUS,
-      top: point.y - RADIUS,
-    })
-    group.addWithUpdate(circle);
-
-    
-    
-
-      
-    
-    cover.set({
-      visible: true,
-      clipPath: group
-    });
-    canvas.renderAll();
-  }
-});
+//     const circle = new fabric.Circle({
+//       radius: RADIUS,
+//       left: point.x - RADIUS,
+//       top: point.y - RADIUS,
+//     })
+//     group.addWithUpdate(circle);
+//     cover.set({
+//       visible: true,
+//       clipPath: group
+//     });
+//     canvas.renderAll();
+//   }
+// });
 
 
-canvas.on('mouse:up', function(e){
-  const { target } = e;
-  let p1 = canvas.getPointer(e.e);
-  const name = target.get('name');
-  window.isDrawing = false;
-  return;
-});
+// canvas.on('mouse:up', function(e){
+//   const { target } = e;
+//   let p1 = canvas.getPointer(e.e);
+//   const name = target.get('name');
+//   window.isDrawing = false;
+//   return;
+// });
 
 
 
