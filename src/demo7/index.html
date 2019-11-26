@@ -1,0 +1,158 @@
+<html>
+  <header>
+    <title>连续模糊</title>
+    <style>
+      canvas {
+        border: 1px solid #ccc;
+        user-select: none;
+      }
+      #g {
+        position: relative;
+      }
+      #pen {
+        display: none;
+        position: absolute;
+        border: 1px solid black;
+        pointer-events: none;
+      }
+    </style>
+  </header>
+  <body>
+    <h2>连续模糊</h2>
+    <div id="g" style="width:448px;height:252px;overflow: hidden;">
+      <canvas id="c" width="448" height="252"></canvas>
+      <div id="pen"></div>
+    </div>
+    <ul>
+      <li>
+        <label for="blurParam">blurParam</label>
+        <input type="range" id="blurParam" min="0" max="50" value="5" />
+        <span id="blurParamVal"></span>
+      </li>
+      <li>
+        <label for="lineWidthParam">lineWidthParam</label>
+        <input type="range" id="lineWidthParam" min="0" max="100" value="50" />
+        <span id="lineWidthParamVal"></span>
+      </li>
+    </ul>
+
+    <script>
+      const params = {};
+      const patternCanvas = document.createElement('canvas');
+      const patternContext = patternCanvas.getContext('2d');
+      const pen = document.getElementById('pen');
+      const group = document.getElementById('g');
+      const el = document.getElementById('c');
+      const ctx = el.getContext('2d');
+
+      function midPointBtw(p1, p2) {
+        return {
+          x: p1.x + (p2.x - p1.x) / 2,
+          y: p1.y + (p2.y - p1.y) / 2,
+        };
+      }
+      // document.body.appendChild(patternCanvas);
+
+      function getPattern() {
+        patternCanvas.width = el.width;
+        patternCanvas.height = el.height;
+
+        patternContext.clearRect(0, 0, patternCanvas.width, patternCanvas.height);
+        patternContext.drawImage(el, 0, 0);
+
+        return ctx.createPattern(patternCanvas, 'no-repeat');
+      }
+
+      function getRelXy(e) {
+        var rect = el.getBoundingClientRect();
+        var x = e.clientX - rect.left; //x position within the element.
+        var y = e.clientY - rect.top; //
+
+        return { x, y };
+      }
+
+      ctx.lineJoin = ctx.lineCap = 'round';
+
+      const img = new Image();
+      img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src =
+        'http://liangcang-material.alicdn.com/prod/upload/c7c1f0b7c39e4d4b9407fbec3cb55211.jpg';
+
+      let isDrawing,
+        points = [];
+
+      function draw(e) {
+        points.push(getRelXy(e));
+
+        ctx.filter = 'none';
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.drawImage(patternCanvas, 0, 0);
+
+        var p1 = points[0];
+        var p2 = points[1];
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+
+        ctx.lineWidth = params.lineWidthParam;
+
+        ctx.filter = `blur(${params.blurParam}px)`;
+
+        for (var i = 1, len = points.length; i < len; i++) {
+          var midPoint = midPointBtw(p1, p2);
+          ctx.quadraticCurveTo(p1.x, p1.y, midPoint.x, midPoint.y);
+          p1 = points[i];
+          p2 = points[i + 1];
+        }
+        ctx.lineTo(p1.x, p1.y);
+        ctx.stroke();
+      }
+
+      group.onmouseenter = function(e) {
+        pen.style.display = 'block';
+      };
+
+      group.onmouseleave = function(e) {
+        pen.style.display = 'none';
+      };
+
+      group.onmousedown = function(e) {
+        isDrawing = true;
+        ctx.strokeStyle = getPattern();
+        points.push(getRelXy(e));
+      };
+
+      group.onmousemove = function(e) {
+        pen.style.width = pen.style.height = `${params.lineWidthParam}px`;
+        pen.style.borderRadius = `${params.lineWidthParam}px`;
+
+        const { x, y } = getRelXy(e);
+        pen.style.top = y - params.lineWidthParam / 2;
+        pen.style.left = x - params.lineWidthParam / 2;
+
+        if (!isDrawing) return;
+        draw(e);
+      };
+
+      group.onmouseup = function(e) {
+        draw(e);
+        isDrawing = false;
+        points.length = 0;
+      };
+
+      ['lineWidthParam', 'blurParam'].forEach(param => {
+        const inputEle = document.getElementById(param);
+        const spanEle = document.getElementById(param + 'Val');
+
+        const syncFunc = e => {
+          spanEle.innerHTML = inputEle.value;
+          params[param] = parseInt(inputEle.value, 10);
+        };
+        inputEle.addEventListener('input', syncFunc, false);
+        syncFunc();
+      });
+    </script>
+  </body>
+</html>

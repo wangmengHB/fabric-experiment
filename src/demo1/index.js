@@ -22,7 +22,7 @@ fabric.filterBackend = webglBackend;
 fabric.Object.prototype.transparentCorners = false;
 fabric.Object.prototype.padding = 5;
 
-const canvas = new fabric.Canvas(canvasEle, {isDrawingMode: true});
+const canvas = new fabric.Canvas(canvasEle, {isDrawingMode: true, preserveObjectStacking: true});
 
 window._canvas = canvas;
 
@@ -30,36 +30,10 @@ const glImage = new GLImage();
 window.glImage = glImage;
 
 
-const RADIUS = 20;
-
 fabric.Image.fromURL(IMG_SRC_1, function(img) {
   const oImg1 = img.set({left: 0, top: 0 });
-  const oImg2 = fabric.util.object.clone(img);
-  oImg2.set({left: 0, top: 0});
-  oImg2.filters.push(
-    new fabric.Image.filters.BlackWhite()
-  );
-  oImg2.applyFilters();
   oImg1.filters = [];
-
-  window.oImg2 = oImg2;
-  const group = new fabric.Group([oImg1, oImg2], {
-    name: 'picture1',
-    id: '123',
-    left: 0,
-    top: 0,
-  });
-  window.group = group;
-
-
-  oImg2.set({
-    visible: false,
-  });
-
-  group.selectable = false
-
-  canvas.add(group);
-
+  canvas.add(oImg1);
 
   var clipPath = new fabric.Circle({
     radius: 40,
@@ -77,15 +51,13 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
 
   canvas.renderAll();
 
-  setTimeout(() => {
-
-  }, 500)
+  
 
   
   
 
   glImage.loadImageSrc(canvas.toDataURL()).then(() => {
-    glImage.applyFilter('saturation', -0.7)
+    glImage.applyFilter('pixelate_block_size', 10)
 
     
     let img2 = new Image();
