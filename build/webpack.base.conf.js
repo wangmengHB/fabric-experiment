@@ -4,7 +4,7 @@ const path = require('path')
 module.exports = {
     context: path.resolve(__dirname, '../'),
     entry: {
-      'fabric-test': path.resolve(__dirname, '../src/demo1'),
+      'fabric-test': path.resolve(__dirname, '../src/demo9/index.tsx'),
     },
     output: {
         path: path.resolve(__dirname, '../dist'),
@@ -14,12 +14,12 @@ module.exports = {
         library: 'CommonUtil'
     },
     resolve: {
-      extensions: ['.ts', '.js', '.json'],
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     },
     module: {
         rules: [
           {
-            test: /\.(js|ts)$/,
+            test: /\.(js|jsx|ts|tsx)$/,
             include: [
               path.resolve(__dirname, '../src')
             ],

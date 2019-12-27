@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true, 
 		"suppressImplicitAnyIndexErrors": true,
 		"noImplicitReturns": true,
 		// "noUnusedLocals": true,
@@ -13,7 +15,7 @@
     "strictNullChecks": false,
     
     "experimentalDecorators": true,
-    "jsx": "preserve",
+    "jsx": "react",
     // "noImplicitAny": true,
     "target": "es6",
     "module": "commonjs",
