@@ -7,13 +7,63 @@ const IMG_SRC_3 = require('../test-images/test3.jpg');
 
 
 const style = document.createElement('style');
-style.innerHTML = 'html body { padding: 0; margin: 0;}';
+style.innerHTML = `
+  html body { padding: 0; margin: 0;} 
+  .canvas-container{float: left}
+  .watch{
+    float: right;
+    width: 300px;
+    margin-right: 20px;
+  }
+  .watch img{ width: 100%;}
+`;
 document.head.appendChild(style);
 
 const canvasEle = document.createElement('canvas');
-canvasEle.width = window.screen.availWidth - 300;
-canvasEle.height = window.screen.availHeight;
+canvasEle.width = 500;
+canvasEle.height = 400;
 document.body.appendChild(canvasEle);
+
+const UpperCanvasDiv = document.createElement('div');
+UpperCanvasDiv.className = 'watch';
+
+UpperCanvasDiv.innerText = 'upper canvas';
+const upperImage = new Image;
+
+UpperCanvasDiv.appendChild(upperImage);
+
+
+const LowerCanvasDiv = document.createElement('div');
+LowerCanvasDiv.className = 'watch';
+LowerCanvasDiv.innerText = 'lower canvas';
+const lowerImage = new Image;
+LowerCanvasDiv.appendChild(lowerImage);
+
+
+document.body.appendChild(UpperCanvasDiv);
+document.body.appendChild(LowerCanvasDiv);
+
+
+setInterval(() => {
+  const upper = document.querySelector('.upper-canvas');
+  if (upper) {
+    upperImage.src = upper.toDataURL();
+  }
+  const lower = document.querySelector('.lower-canvas');
+  if (lower) {
+    lowerImage.src = lower.toDataURL();
+  }
+
+}, 1000)
+
+
+
+
+
+
+
+
+
 
 
 let webglBackend = new fabric.WebglFilterBackend();
@@ -22,7 +72,7 @@ fabric.filterBackend = webglBackend;
 fabric.Object.prototype.transparentCorners = false;
 fabric.Object.prototype.padding = 5;
 
-const canvas = new fabric.Canvas(canvasEle, {isDrawingMode: true, preserveObjectStacking: true});
+const canvas = new fabric.Canvas(canvasEle, {isDrawingMode: false, preserveObjectStacking: true});
 
 window._canvas = canvas;
 
@@ -66,10 +116,9 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
     let texturePatternBrush = new fabric.PatternBrush(canvas);
     texturePatternBrush.source = img2;
 
-    canvas.freeDrawingBrush = texturePatternBrush;
+    // canvas.freeDrawingBrush = texturePatternBrush;
     // canvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
     canvas.freeDrawingBrush.width = 30;
-
 
 
   })
