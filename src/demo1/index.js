@@ -12,7 +12,7 @@ style.innerHTML = `
   .canvas-container{float: left}
   .watch{
     float: right;
-    width: 300px;
+    width: 200px;
     margin-right: 20px;
   }
   .watch img{ width: 100%;}
@@ -26,7 +26,6 @@ document.body.appendChild(canvasEle);
 
 const UpperCanvasDiv = document.createElement('div');
 UpperCanvasDiv.className = 'watch';
-
 UpperCanvasDiv.innerText = 'upper canvas';
 const upperImage = new Image;
 
@@ -39,9 +38,18 @@ LowerCanvasDiv.innerText = 'lower canvas';
 const lowerImage = new Image;
 LowerCanvasDiv.appendChild(lowerImage);
 
+const cacheCanvasDiv = document.createElement('div');
+cacheCanvasDiv.className = 'watch';
+cacheCanvasDiv.innerText = 'cache canvas';
+const cacheImage = new Image;
+cacheCanvasDiv.appendChild(cacheImage);
+
+window.cacheImg = cacheImage;
+
 
 document.body.appendChild(UpperCanvasDiv);
 document.body.appendChild(LowerCanvasDiv);
+document.body.appendChild(cacheCanvasDiv);
 
 
 setInterval(() => {
@@ -53,6 +61,10 @@ setInterval(() => {
   if (lower) {
     lowerImage.src = lower.toDataURL();
   }
+  if (canvas && canvas.cacheCanvasEl) {
+    cacheImage.src = canvas.cacheCanvasEl.toDataURL();
+  }
+
 
 }, 1000)
 
@@ -79,24 +91,26 @@ window._canvas = canvas;
 const glImage = new GLImage();
 window.glImage = glImage;
 
+canvas.on('object:selected', function() {
+  debugger;
+  console.log('object:selected', this.getActiveObject());
+})
+
 
 fabric.Image.fromURL(IMG_SRC_1, function(img) {
   const oImg1 = img.set({left: 0, top: 0 });
-  oImg1.filters = [];
-  canvas.add(oImg1);
-
-  var clipPath = new fabric.Circle({
-    radius: 40,
-    top: -40,
-    left: -40
-  });
+  oImg1.perPixelTargetFind = true;
+    
   var rect = new fabric.Rect({
+    left: 300,
+    top: 200,
     width: 200,
     height: 100,
     fill: 'red',
   });
-  rect.clipPath = clipPath;
+  
   canvas.add(rect);
+  canvas.add(oImg1);
 
 
   canvas.renderAll();
