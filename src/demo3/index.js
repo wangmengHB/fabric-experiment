@@ -65,6 +65,9 @@ html body { padding: 0; margin: 0;}
 
 `;
 document.head.appendChild(style);
+let glImage = new GLImage();
+let canvas = glImage.getCanvas();
+document.body.appendChild(canvas);
 
 
 
@@ -86,7 +89,7 @@ document.body.appendChild(resEle);
 
 
 
-let glImage = new GLImage();
+
 
 async function processSingle(imageSrc) {
   await glImage.loadImageSrc(imageSrc);
@@ -99,22 +102,20 @@ async function processSingle(imageSrc) {
     'vibrance_amount': -0.3,
   });
   console.timeEnd('draw');
+  
 
   const p = new Promise((resolve, reject) => {
-    glImage.getCanvas().toBlob(function (blob) {
+    setTimeout(() => {
       const img = document.createElement("img");
-      const url = URL.createObjectURL(blob);
+      const url = glImage.getDataURL();
       img.src = url;
-      img.onload = function () {
-        // no longer need to read the blob so it's revoked
-        URL.revokeObjectURL(url);  
-      };  
       resEle.appendChild(img);
       resolve('done');
-    });
-  });
+    }, 0)
+  })
 
   await Promise.resolve(p);
+
   return 'success';
 }
 
@@ -142,8 +143,7 @@ batchProcess(imageSrcList).then((result) => {
 
 
 
-let canvas = glImage.getCanvas();
-document.body.appendChild(canvas);
+
 
 
 window.glImage = glImage;

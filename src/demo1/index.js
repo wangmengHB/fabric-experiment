@@ -5,6 +5,8 @@ const IMG_SRC_1 = require('../test-images/test1.png');
 const IMG_SRC_2 = require('../test-images/test2.png');
 const IMG_SRC_3 = require('../test-images/test3.jpg');
 
+window.fabric = fabric;
+
 
 const style = document.createElement('style');
 style.innerHTML = `
@@ -52,7 +54,7 @@ document.body.appendChild(LowerCanvasDiv);
 document.body.appendChild(cacheCanvasDiv);
 
 
-setInterval(() => {
+function drawMonitor(timestamp) {
   const upper = document.querySelector('.upper-canvas');
   if (upper) {
     upperImage.src = upper.toDataURL();
@@ -64,17 +66,11 @@ setInterval(() => {
   if (canvas && canvas.cacheCanvasEl) {
     cacheImage.src = canvas.cacheCanvasEl.toDataURL();
   }
+  requestAnimationFrame(drawMonitor);
+}
 
 
-}, 1000)
-
-
-
-
-
-
-
-
+requestAnimationFrame(drawMonitor);
 
 
 
@@ -92,7 +88,7 @@ const glImage = new GLImage();
 window.glImage = glImage;
 
 canvas.on('object:selected', function() {
-  debugger;
+  
   console.log('object:selected', this.getActiveObject());
 })
 
@@ -108,12 +104,97 @@ fabric.Image.fromURL(IMG_SRC_1, function(img) {
     height: 100,
     fill: 'red',
   });
+
+  window.circle1 = new fabric.Circle({
+    left: 200,
+    top: 300,
+    width: 200,
+    height:200,
+    radius: 100,
+    fill: 'green',
+  });
   
   canvas.add(rect);
   canvas.add(oImg1);
+  canvas.add(window.circle1);
+
+
+  var text = new fabric.Text("  Text with a stroke  ",{
+    left: 100,
+    top: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    stroke: '#ff1318',
+    strokeWidth: 1,
+    // fontStyle: 'italic',
+    fontFamily: 'Delicious',
+    // opacity: 0.3,
+    skewX: -20,
+    skewY: 0
+  });
+
+  canvas.add(text);
+
 
 
   canvas.renderAll();
+
+  window.text = text;
+
+
+  var LabeledRect = fabric.util.createClass(fabric.Rect, {
+    type: 'labeledRect',
+    initialize: function(options) {
+      options || (options = { });
+      this.callSuper('initialize', options);
+      this.set('label', options.label || '');
+      this.set('labelFont', options.labelFont || '');
+      this.set('labelFill', options.labelFill || '');
+    },
+    toObject: function() {
+      return fabric.util.object.extend(this.callSuper('toObject'), {
+        label: this.get('label'),
+        labelFont: this.get('labelFont'),
+        labelFill: this.get('labelFill')
+      });
+    },
+    _render: function(ctx) {
+      this.callSuper('_render', ctx);
+      // ctx.font = '20px Helvetica';
+      // ctx.fillStyle = '#333';
+      console.log('this', this);
+      ctx.font = this.labelFont;
+      ctx.fillStyle = this.labelFill;
+      // ctx.fillText(this.label, -this.width/2, -this.height/2 + 20);
+      ctx.fillText(this.label, 0, 0);
+    }
+  });
+
+  var labeledRect = new LabeledRect({
+    width: 100,
+    height: 50,
+    left: 100,
+    top: 100,
+    label: 'test',
+    fill: '#faa',
+    labelFont: '30px Helvetica',
+    labelFill: '#00ff00'
+  });
+
+
+  canvas.add(labeledRect);
+
+  canvas.renderAll();
+
+  setTimeout(function(){
+    labeledRect.set({
+      label: 'trololo',
+      fill: '#aaf',
+      rx: 10,
+      ry: 10,
+          labelFill: '#0000ff'
+    });
+    canvas.renderAll();
+  }, 3000)
 
   
 
