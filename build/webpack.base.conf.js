@@ -4,7 +4,7 @@ const path = require('path')
 module.exports = {
     context: path.resolve(__dirname, '../'),
     entry: {
-      'fabric-test': path.resolve(__dirname, '../src/demo3/index'),
+      'fabric-test': path.resolve(__dirname, '../src/demo1/index'),
     },
     output: {
         path: path.resolve(__dirname, '../dist'),

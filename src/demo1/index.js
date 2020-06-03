@@ -11,7 +11,10 @@ window.fabric = fabric;
 const style = document.createElement('style');
 style.innerHTML = `
   html body { padding: 0; margin: 0;} 
-  .canvas-container{float: left}
+  .canvas-container{
+    float: left;
+    border: solid 1px red;
+  }
   .watch{
     float: right;
     width: 200px;
@@ -74,6 +77,7 @@ requestAnimationFrame(drawMonitor);
 
 
 
+
 let webglBackend = new fabric.WebglFilterBackend();
 fabric.filterBackend = fabric.initFilterBackend();
 fabric.filterBackend = webglBackend;
@@ -93,130 +97,97 @@ canvas.on('object:selected', function() {
 })
 
 
-fabric.Image.fromURL(IMG_SRC_1, function(img) {
-  const oImg1 = img.set({left: 0, top: 0 });
-  oImg1.perPixelTargetFind = true;
-    
+fabric.util.loadImage(IMG_SRC_3, function(img) {
+  
+  const oImg = new fabric.Image(img);
+  oImg.set({left: 0, top: 0 });
+  oImg.hasControls = false;
+  oImg.hasBorders = false;
+  
   var rect = new fabric.Rect({
-    left: 300,
-    top: 200,
-    width: 200,
-    height: 100,
-    fill: 'red',
-  });
-
-  window.circle1 = new fabric.Circle({
-    left: 200,
-    top: 300,
-    width: 200,
-    height:200,
-    radius: 100,
-    fill: 'green',
-  });
-  
-  canvas.add(rect);
-  canvas.add(oImg1);
-  canvas.add(window.circle1);
-
-
-  var text = new fabric.Text("  Text with a stroke  ",{
     left: 100,
     top: 100,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    stroke: '#ff1318',
-    strokeWidth: 1,
-    // fontStyle: 'italic',
-    fontFamily: 'Delicious',
-    // opacity: 0.3,
-    skewX: -20,
-    skewY: 0
-  });
-
-  canvas.add(text);
-
-
-
-  canvas.renderAll();
-
-  window.text = text;
-
-
-  var LabeledRect = fabric.util.createClass(fabric.Rect, {
-    type: 'labeledRect',
-    initialize: function(options) {
-      options || (options = { });
-      this.callSuper('initialize', options);
-      this.set('label', options.label || '');
-      this.set('labelFont', options.labelFont || '');
-      this.set('labelFill', options.labelFill || '');
-    },
-    toObject: function() {
-      return fabric.util.object.extend(this.callSuper('toObject'), {
-        label: this.get('label'),
-        labelFont: this.get('labelFont'),
-        labelFill: this.get('labelFill')
-      });
-    },
-    _render: function(ctx) {
-      this.callSuper('_render', ctx);
-      // ctx.font = '20px Helvetica';
-      // ctx.fillStyle = '#333';
-      console.log('this', this);
-      ctx.font = this.labelFont;
-      ctx.fillStyle = this.labelFill;
-      // ctx.fillText(this.label, -this.width/2, -this.height/2 + 20);
-      ctx.fillText(this.label, 0, 0);
-    }
-  });
-
-  var labeledRect = new LabeledRect({
     width: 100,
-    height: 50,
-    left: 100,
-    top: 100,
-    label: 'test',
-    fill: '#faa',
-    labelFont: '30px Helvetica',
-    labelFill: '#00ff00'
+    height: 100,
+    stroke: 'red',
+    lineWidth: 10,
+    fill: 'rgba(0, 0, 0, 0)',
   });
 
 
-  canvas.add(labeledRect);
+  var clipRect = fabric.util.object.clone(rect);
+  clipRect.set({ absolutePositioned: true })
+  oImg.clipPath = clipRect;
+
+  window.clipPath = clipRect;
+  window.rect = rect;
+  window.oImg = oImg;
+
+
+
+  
+  canvas.add(oImg);
+  canvas.add(rect);
+
+  
 
   canvas.renderAll();
 
-  setTimeout(function(){
-    labeledRect.set({
-      label: 'trololo',
-      fill: '#aaf',
-      rx: 10,
-      ry: 10,
-          labelFill: '#0000ff'
-    });
-    canvas.renderAll();
-  }, 3000)
 
-  
-
-  
-  
-
-  glImage.loadImageSrc(canvas.toDataURL()).then(() => {
-    glImage.applyFilter('pixelate_block_size', 10)
-
+  rect.on('moving', (e) => {
+    console.log('move', e.target);
+    const { left, top, width, height, scaleX, scaleY } = rect;
+    // TODO find oImg
+    const clipPath = oImg.clipPath;
     
-    let img2 = new Image();
-    img2.src = glImage.toDataUrl();
+    let clipLeft = clipPath.left;
+    let clipTop = clipPath.top;
 
-    let texturePatternBrush = new fabric.PatternBrush(canvas);
-    texturePatternBrush.source = img2;
 
-    // canvas.freeDrawingBrush = texturePatternBrush;
-    // canvas.freeDrawingBrush.color = 'rgba(0,0,0,0)';
-    canvas.freeDrawingBrush.width = 30;
+    clipPath.set({ left, top});
+    let imgLeft = oImg.left;
+    let imgTop = oImg.top;
 
+    oImg.set({
+      left: imgLeft + (left - clipLeft),  top: imgTop + (top - clipTop),
+    });
+  })
+
+  rect.on('modified', () => {
+    console.log('modified');
+    const { left, top, width, height, scaleX, scaleY } = rect;
+    // TODO find oImg
+    const clipPath = oImg.clipPath;
+    let clipLeft = clipPath.left;
+    let clipTop = clipPath.top;
+    let imgLeft = oImg.left;
+    let imgTop = oImg.top;
+
+    clipPath.set({ left, top, width, height, scaleX, scaleY});
+    oImg.clipPath = clipPath;
+    oImg.set({
+      left: imgLeft + (left - clipLeft), 
+      top: imgTop + (top - clipTop), 
+      scaleX, 
+      scaleY: scaleX
+    });
 
   })
+
+  
+
+  
+
+  
+  
+
+  
+
+
+  
+  
+
+  
 
 
 

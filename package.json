@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/wangmengHB/fabric-experiment#readme",
   "dependencies": {
+    "@tensorflow-models/body-pix": "^2.0.5",
+    "@tensorflow/tfjs": "^1.7.4",
     "browser-psd": "^3.2.9",
     "fabric": "^3.4.0",
     "gl-image": "^0.0.2",
