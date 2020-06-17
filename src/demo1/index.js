@@ -8,25 +8,10 @@ const IMG_SRC_3 = require('../test-images/test3.jpg');
 window.fabric = fabric;
 
 
-const style = document.createElement('style');
-style.innerHTML = `
-  html body { padding: 0; margin: 0;} 
-  .canvas-container{
-    float: left;
-    border: solid 1px red;
-  }
-  .watch{
-    float: right;
-    width: 200px;
-    margin-right: 20px;
-  }
-  .watch img{ width: 100%;}
-`;
-document.head.appendChild(style);
 
 const canvasEle = document.createElement('canvas');
-canvasEle.width = 500;
-canvasEle.height = 400;
+canvasEle.width = 600;
+canvasEle.height = 500;
 document.body.appendChild(canvasEle);
 
 const UpperCanvasDiv = document.createElement('div');
@@ -76,8 +61,6 @@ function drawMonitor(timestamp) {
 requestAnimationFrame(drawMonitor);
 
 
-
-
 let webglBackend = new fabric.WebglFilterBackend();
 fabric.filterBackend = fabric.initFilterBackend();
 fabric.filterBackend = webglBackend;
@@ -97,248 +80,94 @@ canvas.on('object:selected', function() {
 })
 
 
-fabric.util.loadImage(IMG_SRC_3, function(img) {
-  
-  const oImg = new fabric.Image(img);
-  oImg.set({left: 0, top: 0 });
-  oImg.hasControls = false;
-  oImg.hasBorders = false;
-  
-  var rect = new fabric.Rect({
-    left: 100,
-    top: 100,
-    width: 100,
-    height: 100,
-    stroke: 'red',
-    lineWidth: 10,
-    fill: 'rgba(0, 0, 0, 0)',
-  });
-
-
-  var clipRect = fabric.util.object.clone(rect);
-  clipRect.set({ absolutePositioned: true })
-  oImg.clipPath = clipRect;
-
-  window.clipPath = clipRect;
-  window.rect = rect;
-  window.oImg = oImg;
+window.isDrawing = false;
 
 
 
-  
-  canvas.add(oImg);
-  canvas.add(rect);
+var video1El = document.getElementById('video1');
 
-  
+var rect = new fabric.Rect({
+  left: -100,
+  top: -100,
+  width: 300,
+  height: 280,
+})
 
+var video1 = new fabric.Image(video1El, {
+  left: 0,
+  top: 0,
+  objectCaching: false,
+  clipPath: rect,
+  // objectCaching: true,
+  statefullCache: true,
+  cacheProperties: ['videoTime'],
+});
+
+
+
+
+canvas.add(video1);
+
+canvas.renderAll();
+
+setTimeout(() => {
+  video1El.play();
+  // video1El.muted = false;
+  // var tmpCanvas = document.createElement('canvas');
+  // tmpCanvas.width = video1El.videoWidth;
+  // tmpCanvas.height = video1El.videoHeight;;
+  // var ctx = tmpCanvas.getContext('2d');
+
+  // ctx.drawImage(video1El, 0, 0);
+
+
+  // // ctx.fillStyle = 'green';
+  // // ctx.fillRect(10, 10, 180, 180);
+
+  // window.ctx = ctx;
+  // window.tmp = tmpCanvas;
+
+
+
+  // var testCanvas = new fabric.Image(tmpCanvas, {
+  //   left: 0,
+  //   top: 0,
+  //   angle: 0,
+  //   objectCaching: false,
+  //   // clipPath: rect
+  // });
+
+
+  // canvas.add(testCanvas);
+
+
+
+}, 1000)
+
+
+
+
+
+
+
+
+
+fabric.util.requestAnimFrame(function render() {
   canvas.renderAll();
+  fabric.util.requestAnimFrame(render);
 
+  video1.videoTime = video1El.currentTime;
 
-  rect.on('moving', (e) => {
-    console.log('move', e.target);
-    const { left, top, width, height, scaleX, scaleY } = rect;
-    // TODO find oImg
-    const clipPath = oImg.clipPath;
-    
-    let clipLeft = clipPath.left;
-    let clipTop = clipPath.top;
+  if (window.ctx) {
+    window.ctx.drawImage(video1El, 0, 0);
+  }
 
-
-    clipPath.set({ left, top});
-    let imgLeft = oImg.left;
-    let imgTop = oImg.top;
-
-    oImg.set({
-      left: imgLeft + (left - clipLeft),  top: imgTop + (top - clipTop),
-    });
-  })
-
-  rect.on('modified', () => {
-    console.log('modified');
-    const { left, top, width, height, scaleX, scaleY } = rect;
-    // TODO find oImg
-    const clipPath = oImg.clipPath;
-    let clipLeft = clipPath.left;
-    let clipTop = clipPath.top;
-    let imgLeft = oImg.left;
-    let imgTop = oImg.top;
-
-    clipPath.set({ left, top, width, height, scaleX, scaleY});
-    oImg.clipPath = clipPath;
-    oImg.set({
-      left: imgLeft + (left - clipLeft), 
-      top: imgTop + (top - clipTop), 
-      scaleX, 
-      scaleY: scaleX
-    });
-
-  })
-
-  
-
-  
-
-  
-  
-
-  
-
-
-  
-  
-
-  
-
-
-
-
-  
 
 });
 
-window.isDrawing = false;
-
-// canvas.on('mouse:down', function(e){
-//   const { target } = e;
-//   let p1 = canvas.getPointer(e.e);
-//   const name = target && target.get('name');
-
-  
-  
-//   if (name === 'picture1') {
-//     window.isDrawing = true;     
-    
-//     const cover = target.item(1);
-
-//     const point = {
-//       x: cover.left + p1.x - target.left,
-//       y: cover.top + p1.y - target.top
-//     };
-
-//     let clipPath;
-
-//     if (cover.clipPath) {
-//       clipPath = cover.clipPath;
-//     } else {
-//       clipPath = new fabric.Group([]);
-//       const circle = new fabric.Circle({
-//         radius: RADIUS,
-//         left: point.x - RADIUS,
-//         top: point.y - RADIUS,
-//       })
-//       clipPath.addWithUpdate(circle);
-      
-//     }
-
-//     window._path = clipPath;
-   
-    
-//     cover.set({
-//       visible: true,
-//       clipPath: clipPath
-//     });
-//     canvas.renderAll();
-//   }
-// });
-
-// canvas.on('mouse:move', function(e){
-//   const { target } = e;
-//   let p1 = canvas.getPointer(e.e);
-//   const name = target && target.get('name');
-//   if (!isDrawing) {
-//     return;
-//   }
-
-//   if (name === 'picture1') {     
-    
-//     const cover = target.item(1);
-
-//     const point = {
-//       x: cover.left + p1.x - target.left,
-//       y: cover.top + p1.y - target.top
-//     };
-
-//     let clipPath = cover.clipPath;
-
-//     if (!clipPath) {
-//       return;
-//     }
-
-//     let group = fabric.util.object.clone(clipPath);
-
-//     const circle = new fabric.Circle({
-//       radius: RADIUS,
-//       left: point.x - RADIUS,
-//       top: point.y - RADIUS,
-//     })
-//     group.addWithUpdate(circle);
-//     cover.set({
-//       visible: true,
-//       clipPath: group
-//     });
-//     canvas.renderAll();
-//   }
-// });
-
-
-// canvas.on('mouse:up', function(e){
-//   const { target } = e;
-//   let p1 = canvas.getPointer(e.e);
-//   const name = target.get('name');
-//   window.isDrawing = false;
-//   return;
-// });
 
 
 
-document.addEventListener('keydown', e => {
-  
-  if (e.keyCode === 90 && e.ctrlKey) {
-    // undo
-    if (oImg2.clipPath && oImg2.clipPath.type === 'group') {
-      let group = fabric.util.object.clone(oImg2.clipPath);
-      const items = group.getObjects();
-      console.log(items.length)
-      if (Array.isArray(items) && items.length > 1) {
-        group.removeWithUpdate(items[items.length - 1]);
-      } else {
-        group = new fabric.Group([]);
-      }  
-      oImg2.set({
-        clipPath: group
-      })
-      canvas.renderAll();
-
-    }
-    
-  }
-
-})
-
-
-
-
-  
-
-  function test() {
-
-    try {
-      console.log('try');
-      
-      return console.log('return') || 'rest';
-      throw new Error();
-    } catch (e) {
-      console.log('catch');
-    } finally {
-      console.log('finally.')
-    }
-
-    console.log('last part');
-  
-  }
-  let a = test();
-  console.log('a', a);
-  console.log('run test');
 
 
 
