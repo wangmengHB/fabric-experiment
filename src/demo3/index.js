@@ -1,9 +1,5 @@
 import GLImage from 'gl-image';
 
-const IMG_SRC_1 = require('../test-images/test1.png');
-const IMG_SRC_2 = require('../test-images/test2.png');
-const IMG_SRC_3 = require('../test-images/test3.jpg');
-
 
 const SRC_1 = './test-images/1.jpg';
 const SRC_2 = './test-images/2.jpg';
@@ -37,37 +33,15 @@ const imageSrcList = [
   // SRC_12,
 ];
 
-const style = document.createElement('style');
-style.innerHTML = `
-html body { padding: 0; margin: 0;}
-.origin{
-  position: absolute;
-  right: 400px;
-  top: 0;
-  width: 300px;
-  
-}
 
-.origin img{
-  width: 100%;
-}
 
-.result {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 300px;
-}
 
-.result img{
-  width: 100%;
-}
-
-`;
-document.head.appendChild(style);
 let glImage = new GLImage();
 let canvas = glImage.getCanvas();
+canvas.style.width = '200px';
 document.body.appendChild(canvas);
+
+window._canvas = canvas;
 
 
 

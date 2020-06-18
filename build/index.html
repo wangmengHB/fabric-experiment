@@ -3,6 +3,7 @@
 <head>
 <script src="//cdn.jsdelivr.net/npm/phaser@3.23.0/dist/phaser.js"></script>
 <script src="./lib/psd.js"></script>
+<script src="./fabric.js"></script>
 <style>
 html body { padding: 0; margin: 0;} 
   .canvas-container{
@@ -15,17 +16,42 @@ html body { padding: 0; margin: 0;}
     margin-right: 20px;
   }
   .watch img{ width: 100%;}
+
+
+.origin{
+  position: absolute;
+  right: 400px;
+  top: 0;
+  width: 300px;
+  
+}
+
+.origin img{
+  width: 100%;
+}
+
+.result {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 300px;
+}
+
+.result img{
+  width: 100%;
+}
+
+
 </style>
+
 </head>
 
 <body>
-<button id="play">play</button>
 <canvas id="c" width="300" height="300"></canvas>
 
-<video id="video1" style="display: none" class="canvas-img" width="480" height="360" muted="muted">
-  <source id="video_src1" src="/蛋糕.mp4" type="video/mp4">
-</video>
 
+
+<button id="rec" disabled>record</button>
 
 </body>
 </html>
