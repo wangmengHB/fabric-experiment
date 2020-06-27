@@ -1,14 +1,13 @@
 import './command/test';
+import { AudioBufferLoader } from './audio';
 import GLImage from 'gl-image';
 
 var fabric = window.fabric;
 
+const PIC_URL = './test-images/test1.png';
 
-const IMG_SRC_1 = './test-images/test1.png';
-const IMG_SRC_2 = './test-images/test2.png';
-const IMG_SRC_3 = '../test-images/test3.jpg';
-
-
+const PIC_IMAGE = new Image();
+PIC_IMAGE.src = PIC_URL;
 
 
 
@@ -73,6 +72,7 @@ fabric.Object.prototype.transparentCorners = false;
 fabric.Object.prototype.padding = 5;
 
 const canvas = new fabric.Canvas(canvasEle, {isDrawingMode: false, preserveObjectStacking: true});
+canvas.backgroundColor = '#fff'
 
 window._canvas = canvas;
 
@@ -137,8 +137,12 @@ function setupVideo(url) {
 }
 
 
+const testCanvas = document.createElement('canvas');
+testCanvas.width = 650;
+testCanvas.height = 200;
 
-var video1;
+
+var video1, mockVideo, image1;
 var video1El = setupVideo(VIDEO_URL);
 window.video1El = video1El;
 video1El.onloadedmetadata = () => {
@@ -159,16 +163,16 @@ c0,7.66,2.98,14.87,8.4,20.29l0,0c5.42,5.42,12.62,8.4,20.28,8.4c7.66,0,14.87\
 
 
       path.set({
-        left: 120,
-        top: 100,
-        scaleX: 3,
-        scaleY: 3,
+        left: 490,
+        top: 0,
+        scaleX: 1,
+        scaleY: 1,
         absolutePositioned: true,
       })
       
       video1 = new fabric.Image(video1El, {
         left: 0,
-        top: 100,
+        top: -10,
         objectCaching: false,
         clipPath: path,
         // objectCaching: true,
@@ -177,21 +181,49 @@ c0,7.66,2.98,14.87,8.4,20.29l0,0c5.42,5.42,12.62,8.4,20.28,8.4c7.66,0,14.87\
         hasControls: false,
         hasBorders: false,
       });
-      video1.filters = [
+      
+      
+  
+   
+
+      mockVideo = new fabric.Image(testCanvas, {
+        left: 0,
+        top: 400,
+        width: 650,
+        height: 200,
+        statefullCache: true,
+        cacheProperties: ['videoTime'],
+      });
+
+      canvas.add(mockVideo);
+      canvas.add(video1);
+      canvas.add(new fabric.Textbox('canvas录制的视频', {
+        left: 10, top: 10, 
+        stroke: 'blue', fill: 'red',
+        hasControls: false,
+        hasBorders: false,
+      }));
+
+      image1 = new fabric.Image(PIC_IMAGE, {
+        left: -10,
+        top: 150,
+        scaleX: 0.5,
+        scaleY: 0.5,
+        hasControls: false,
+        hasBorders: false,
+      });
+
+      image1.filters = [
         new fabric.Image.filters.Brightness({ brightness: 0 }),
         new fabric.Image.filters.Contrast({ contrast: 0 }),
         new fabric.Image.filters.HueRotation({ rotation: 0 }),
         new fabric.Image.filters.Saturation({ saturation: 0 }),
       ];
-      video1.applyFilters();
-  
-      canvas.add(video1);
-      canvas.add(new fabric.Textbox('这是一个canvas录制的视频', {
-        left: 20, top: 20, 
-        stroke: 'red', fill: 'red',
-        hasControls: false,
-        hasBorders: false,
-      }))  
+      window.image1 = image1;
+      image1.centeredScaling = true;
+
+      canvas.add(image1);
+
       
       canvas.renderAll();
     }
@@ -212,48 +244,11 @@ c0,7.66,2.98,14.87,8.4,20.29l0,0c5.42,5.42,12.62,8.4,20.28,8.4c7.66,0,14.87\
 
 
 
-fabric.util.requestAnimFrame(function render() {
-  
-  
-  setTimeout(() => {
-    canvas.renderAll();
-    fabric.util.requestAnimFrame(render);
-  }, 10)
-  
-  
-  
 
-  if (video1 && video1El && video1.videoTime !== video1El.currentTime) {
-    video1.videoTime = video1El.currentTime;
-    
-
-    // console.log(video1El.currentTime);
-    
-    video1.filters[0].brightness = ramdomVal();
-    video1.filters[1].contrast = ramdomVal();
-    video1.filters[2].rotation = ramdomVal();
-    video1.filters[3].saturation = ramdomVal();
-
-    video1.applyFilters();
-
-    
-    
-
-  }
-  
-
-
-
-  if (window.ctx) {
-    window.ctx.drawImage(video1El, 0, 0);
-  }
-
-
-});
 
 
 function ramdomVal() {
-  let val = Math.random() * 1 - 0.5;
+  let val = Math.random() * 1.2 - 0.6;
   return val;
 
 }
@@ -262,87 +257,191 @@ function ramdomVal() {
 
 
 
-var cStream,
-  aStream,
-  vid,
-  recorder,
-  chunks = [];
+
+const audioContext = new AudioContext();
+const audioLoader  = new AudioBufferLoader(audioContext);
+audioLoader.loadBuffer('/只对你有感觉.mp3').then((buffer) => {
+
+  let recorder, chunks = [];
+  
+  const sourceNode = audioContext.createBufferSource();
+  sourceNode.buffer = buffer;
 
 
-function clickHandler() {
-  this.textContent = 'stop recording';
 
-  const target = canvas.getElement();
-  cStream = target.captureStream(30);
-  cStream.addTrack(aStream.getAudioTracks()[0]);
-  recorder = new MediaRecorder(cStream);
-  recorder.start();
-  recorder.ondataavailable = saveChunks;
-  recorder.onstop = exportStream;
-  this.onclick = stopRecording;
-};
+  // 创建一个 dest 节点, 用于保存流
+  const dest = audioContext.createMediaStreamDestination();
+  const aStream = dest.stream;
+  
+  const analyser = audioContext.createAnalyser();
+  analyser.fftSize = 512;
 
-function exportStream(e) {
+  sourceNode.connect(analyser);
+  analyser.connect(audioContext.destination);
+  analyser.connect(dest);
 
-  if (chunks.length > 0) {
 
-    var blob = new Blob(chunks, { type: "video/webm" })
-    var vidURL = URL.createObjectURL(blob);
-    var vid = document.createElement('video');
-    vid.controls = true;
-    vid.src = vidURL;
-    vid.onend = function() {
-      URL.revokeObjectURL(vidURL);
-    }
-    document.body.appendChild(vid);
-  }
-}
-
-function saveChunks(e) {
-  e.data.size && chunks.push(e.data);
-}
-
-function stopRecording() {
-
-  vid.pause();
-  this.parentNode.removeChild(this);
-  recorder.stop();
-
-}
-
-function initAudioStream(evt) {
-
-  var audioCtx = new AudioContext();
-  // create a stream from our AudioContext
-  var dest = audioCtx.createMediaStreamDestination();
-  aStream = dest.stream;
-  // connect our audio element's output to the stream
-  var sourceNode = audioCtx.createMediaElementSource(this);
-  sourceNode.connect(dest)
-    // start the video
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
 
   setTimeout(() => {
-    this.play();
-    sourceNode.connect(audioCtx.destination);
-
+    sourceNode.start(0);
+    
     
     rec.onclick = clickHandler;
     rec.disabled = false;
-  }, 1000) 
+  }, 1000);
+
+
+
+
+  function clickHandler() {
+    this.textContent = 'stop recording';
+
+    const target = canvas.getElement();
+    const cStream = target.captureStream();
+    cStream.addTrack(aStream.getAudioTracks()[0]);
+    recorder = new MediaRecorder(cStream);
+    recorder.start();
+    recorder.ondataavailable = saveChunks;
+    recorder.onstop = exportStream;
+    this.onclick = stopRecording;
+  };
+
+  function exportStream(e) {
+
+    if (chunks.length > 0) {
+
+      var blob = new Blob(chunks, { type: "video/mp4" })
+      var vidURL = URL.createObjectURL(blob);
+      var vid = document.createElement('video');
+      vid.controls = true;
+      vid.src = vidURL;
+      vid.onend = function() {
+        URL.revokeObjectURL(vidURL);
+      }
+      document.body.appendChild(vid);
+    }
+  }
+
+  function saveChunks(e) {
+    e.data.size && chunks.push(e.data);
+  }
+
+  function stopRecording() {
+    sourceNode.stop();
+    this.parentNode.removeChild(this);
+    recorder.stop();
+  }
+
+
+
+  var ctx = testCanvas.getContext("2d");
+  var WIDTH = testCanvas.width;
+  var HEIGHT = testCanvas.height;
+
+
+  window.ctx = ctx;
+
+  var barWidth = (WIDTH / bufferLength) * 1.5;
+  var barHeight;
+
+
+  let lastAvg = 0;
+
+  fabric.util.requestAnimFrame(function render() {
+  
+    
+    canvas.renderAll();
   
 
+    if (video1 && video1El && video1.videoTime !== video1El.currentTime) {
+      video1.videoTime = video1El.currentTime;
+      mockVideo.videoTime = video1El.currentTime;
+      
+      image1.filters[0].brightness = ramdomVal();
+      image1.filters[1].contrast = ramdomVal();
+      image1.filters[2].rotation = ramdomVal();
+      image1.filters[3].saturation = ramdomVal();
+
+      image1.applyFilters();
+
+      analyser.getByteFrequencyData(dataArray);
   
-};
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-var loadVideo = function() {
+      for (var i = 0, x = 0; i < bufferLength; i=i+1 ) {
+          barHeight = dataArray[i];
 
-  vid = document.createElement('audio');
-  vid.crossOrigin = 'anonymous';
-  vid.oncanplay = initAudioStream;
-  vid.src = '/Unravel.mp3';  
+          var r = barHeight + 25 * (i / bufferLength);
+          var g = 250 * (i / bufferLength);
+          var b = 50;
+
+          ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+          ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
+
+          x += barWidth + 2;
+      }
+
+    }
+
+    let avg = 0;
+    for (let i = 0; i < bufferLength; i++) {
+      avg += dataArray[i];
+    }
+    avg = avg / bufferLength;
+
+
+    if (lastAvg > 0) {
+      let scale = avg - lastAvg;
+      let originScaleX = image1.scaleX;
+      let next = originScaleX + (scale / 1000);
+
+      if (scale > 0) {
+        next = MIN;
+      } else {
+        next = MAX;
+      }
+
+      image1.set(next);
+
+  
+
+    }
+
+
+    lastAvg = avg;
+
+    fabric.util.requestAnimFrame(render);
+    
+
+
+  
+  });
+
+
+
+});
+
+
+const MIN = {
+  scaleX: 0.5,
+  scaleY: 0.5,
+  left: -0,
+
 }
 
-loadVideo();
+const MAX = {
+  scaleX: 0.8,
+  scaleY: 0.8,
+  left: -200,
+};
+
+
+
+
+
+
 
 
 
