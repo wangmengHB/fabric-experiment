@@ -227,6 +227,7 @@ const audioContext = new AudioContext();
 const audioLoader  = new AudioBufferLoader(audioContext);
 audioLoader.loadBuffer('/只对你有感觉.mp3').then((buffer) => {
 
+
   let recorder, chunks = [];
   
   const sourceNode = audioContext.createBufferSource();
@@ -241,7 +242,11 @@ audioLoader.loadBuffer('/只对你有感觉.mp3').then((buffer) => {
   const analyser = audioContext.createAnalyser();
   analyser.fftSize = 512;
 
-  sourceNode.connect(analyser);
+  var synthDelay = audioContext.createDelay(5.0);
+
+  sourceNode.connect(synthDelay)
+
+  synthDelay.connect(analyser);
   analyser.connect(audioContext.destination);
   analyser.connect(dest);
 
@@ -251,16 +256,25 @@ audioLoader.loadBuffer('/只对你有感觉.mp3').then((buffer) => {
 
   const dataArray = new Uint8Array(bufferLength);
 
-  setTimeout(() => {
-    sourceNode.start(0);
+
+  const aBtn = document.getElementById('audio');
+  aBtn.disabled = false;
+
+  let uid = 0;
+  aBtn.onclick = () => {
+    if (uid % 2 === 0) {
+      sourceNode.start(0);
+      rec.onclick = clickHandler;
+      rec.disabled = false;
+    } else {
+      sourceNode.stop();
+    }
+    uid++;
     
-    
-    rec.onclick = clickHandler;
-    rec.disabled = false;
-  }, 1000);
+  }
+  
 
-
-
+  
 
   // bufferlength is half of fftSize -> this initializes the radius to be 5
   var nodes = d3.range(bufferLength).map(function(j) {
@@ -422,10 +436,7 @@ audioLoader.loadBuffer('/只对你有感觉.mp3').then((buffer) => {
 
       })
 
-      const WAVE_DATA = bins_select(200, dataArray);
-
       
-
       hexbin(CANVAS_WIDTH, CANVAS_HEIGHT, dataArray, context2);
 
       force.alpha(1);
@@ -457,7 +468,7 @@ audioLoader.loadBuffer('/只对你有感觉.mp3').then((buffer) => {
           
           
         }
-        image1.filters[0].brightness = ramdomVal(0.3, -0.2);
+        image1.filters[0].brightness = ramdomVal(0.2, -0.3);
         // image1.filters[1].contrast = ramdomVal();
         // image1.filters[2].rotation = ramdomVal();
         // image1.filters[3].saturation = ramdomVal();
@@ -569,7 +580,14 @@ var svg = d3.select("body").append("svg")
 
 function hexbin(width, height, waveform_array, ctx) {
 
-  
+  let avg = 0;
+  for (let i = 0; i < waveform_array.length; i++) {
+    avg += waveform_array[i];
+  }
+  if (avg < 10) {
+    return;
+  } 
+
 
 
   var randomX = d3.random.normal(width/2, 300);
@@ -614,51 +632,6 @@ function hexbin(width, height, waveform_array, ctx) {
       
 };
 
-
-function hexbin_thumb() {
-
-  // http://bl.ocks.org/mbostock/4248145 
-  // http://bl.ocks.org/mbostock/4248146
-
-  var width = $('#hexbin').width();
-  var height = $('#hexbin').height();
-
-  if (State.thumbs_init[6] != 'init') {
-    root.svg_thumb_seven = d3.select("#hexbin").append("svg")
-      .attr("width", '100%')
-      .attr("height", '100%');
-
-    State.thumbs_init[6] = 'init';
-    randomX_t7 = d3.random.normal(width/2, 50),
-      ps_t7 = d3.range(1024).map(function() { return randomX_t7(); });
-  }
-
-  $('#hexbin svg').empty();
-  points_t7 = d3.zip(ps_t7, c.normalize(height*1.5, -20));
-
-  color_t7 = d3.scale.linear()
-      .domain([0, 50])
-      .range(["black", "white"])
-      .interpolate(d3.interpolateLab);
-
-  hexbin_t7 = d3.hexbin()
-      .size([width, height])
-      .radius(15);
-
-  radius_t7 = d3.scale.linear()
-      .domain([0, 10])
-      .range([0, 15]);
-
-  svg_thumb_seven.append("g")
-    .selectAll(".hexagon")
-      .data(hexbin_t7(points_t7))
-    .enter().append("path")
-      .attr("class", "hexagon")
-      .attr("d", function(d) { return hexbin_t7.hexagon(15); })
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-      .style("fill", function(d) { return color_t7(d.length); });
-
-  };
 
 
 
