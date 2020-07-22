@@ -18,7 +18,7 @@
     </style>
   </header>
   <body>
-    <h2>连续模糊</h2>
+    
     <div id="g" style="width:448px;height:252px;overflow: hidden;">
       <canvas id="c" width="448" height="252"></canvas>
       <div id="pen"></div>
@@ -63,7 +63,7 @@
         return ctx.createPattern(patternCanvas, 'no-repeat');
       }
 
-      function getRelXy(e) {
+      function getPoint(e) {
         var rect = el.getBoundingClientRect();
         var x = e.clientX - rect.left; //x position within the element.
         var y = e.clientY - rect.top; //
@@ -84,7 +84,7 @@
         points = [];
 
       function draw(e) {
-        points.push(getRelXy(e));
+        points.push(getPoint(e));
 
         ctx.filter = 'none';
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -121,14 +121,14 @@
       group.onmousedown = function(e) {
         isDrawing = true;
         ctx.strokeStyle = getPattern();
-        points.push(getRelXy(e));
+        points.push(getPoint(e));
       };
 
       group.onmousemove = function(e) {
         pen.style.width = pen.style.height = `${params.lineWidthParam}px`;
         pen.style.borderRadius = `${params.lineWidthParam}px`;
 
-        const { x, y } = getRelXy(e);
+        const { x, y } = getPoint(e);
         pen.style.top = y - params.lineWidthParam / 2;
         pen.style.left = x - params.lineWidthParam / 2;
 
