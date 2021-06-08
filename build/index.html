@@ -45,16 +45,102 @@ html body { padding: 0; margin: 0;}
 }
 
 
+
+
+
+.banner-editor-wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background: #e7ebee;
+    box-sizing: border-box;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    z-index: 10;
+}
+
+.banner-editor-editbar-wrapper {
+    top: 0;
+    left: 40px;
+}
+
+.image-resize {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+}
+
+.image-resize-phantom {
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: .3;
+    position: absolute;
+    cursor: auto;
+    display: none;
+    user-select: none;
+    border-radius: 4px;
+
+}
+
+.image-resize-image-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    user-select: none;
+    border-radius: 4px;
+}
+
+
+.image-resize-image {
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    user-select: none;
+    border-radius: 4px;
+}
+
+.image-resize-image-box {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    border-radius: 4px;
+    z-index: 1;
+    overflow: hidden;
+    border: 2px solid #fff;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.cropper{
+  width: 80%;
+  height: 100px;
+  margin: 40px auto;
+  border: solid 1px red;
+  position: relative;
+}
+
+
+.image{
+  position: absolute;
+}
+
 </style>
 
 </head>
 
 <body>
-<canvas id="c" width="300" height="300"></canvas>
+<!-- <canvas id="c" width="300" height="300"></canvas>
 
 
 <button id="audio" disabled>play</button>
-<button id="rec" disabled>record</button>
+<button id="rec" disabled>record</button> -->
 
 </body>
 </html>

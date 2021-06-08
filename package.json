@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --inline --progress --config ./build/webpack.dev.conf.js"
   },
   "repository": {
@@ -19,14 +18,14 @@
   "homepage": "https://github.com/wangmengHB/fabric-experiment#readme",
   "dependencies": {
     "@tensorflow-models/body-pix": "^2.0.5",
-    "@tensorflow/tfjs": "^1.7.4",
+    "@tensorflow/tfjs": "^2.7.0",
     "browser-psd": "^3.2.9",
     "fabric": "^3.4.0",
     "gl-image": "latest",
     "psd": "^3.2.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
-    "util-kit": "^0.0.0-rc.6",
+    "util-kit": "^0.1.4",
     "web-util-kit": "^0.0.2"
   },
   "devDependencies": {
@@ -35,6 +34,7 @@
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-typescript": "^7.1.0",
     "@babel/register": "^7.0.0",
+    "@tensorflow/tfjs-core": "^2.7.0",
     "@types/jest": "^23.3.13",
     "@types/keytar": "^4.0.1",
     "@types/minimist": "^1.2.0",

@@ -14,7 +14,7 @@ const config = merge(base, {
         contentBase: path.join(__dirname, "../dist"), 
         compress: true,
         host: '0.0.0.0',
-        port: 8081,
+        port: 8082,
         useLocalIp: true,
         open: true,
         overlay: { 

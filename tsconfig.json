@@ -36,7 +36,7 @@
   },
   "include": [
     "**/*.ts",
-    "./test/**/*",
+    "./test/**/*", "src/demo10/index.ts",
 	],
   "exclude": [
     "node_modules",
